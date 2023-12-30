@@ -33,13 +33,6 @@ class Solver:
 
         # transpose the matrix
         transposed_pattern = [''.join(i) for i in zip(*pattern)]
-
-        [print(line) for line in pattern]
-        print('-------------------------')
-        [print(line) for line in transposed_pattern]
-        print('-------------------------')
-        [print(''.join(line)) for line in zip(*transposed_pattern)]
-
         for i in range(len(transposed_pattern) - 1):
             if self.is_horizontal_mirror(transposed_pattern, i, allowed_distance):
                 mirror_idx = i
@@ -52,19 +45,18 @@ class Solver:
 
     def is_horizontal_mirror(self, pattern: list[str], row: int, allowed_distance: int) -> bool:
         m_i = row + 1
+        total_diff = 0
         for i in range(row, -1, -1):
             if m_i >= len(pattern):
                 break
-            dist = self.distance(pattern[m_i], pattern[i])
-            if dist == -1 or dist > allowed_distance:
+            total_diff += self.distance(pattern[m_i], pattern[i])
+            if total_diff > allowed_distance:
                 return False
             m_i += 1
-        return True
+        return total_diff == allowed_distance
     
     # expects that left and right have the same length
     def distance(self, left: str, right: str) -> int:
-        if len(left) != len(right):
-            return -1
         res = 0
         for i in range(len(left)):
             if left[i] != right[i]:
@@ -72,8 +64,8 @@ class Solver:
         return res
 
 if __name__ == '__main__':
-    file = 'test-input.txt'
+    file = 'input.txt'
     with open(file, 'r') as reader:
         data = read_input(reader.read())
         solver = Solver(data)
-        print('Result: {}'.format(solver.solve(0)))
+        print('Result: {}'.format(solver.solve(1)))
