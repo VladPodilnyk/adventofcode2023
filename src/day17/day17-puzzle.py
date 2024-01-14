@@ -60,7 +60,7 @@ class Solver:
 
     # This solution is based on Dijkstra’s algorithm shortest path algorithm
     # For more info about the algorithm itself, see a nice explanation here: https://www.youtube.com/watch?v=XEb7_z5dG3c
-    def _solve(self, min_steps: int) -> int:
+    def _solve(self, min_steps: int, max_steps: int) -> int:
         # target point
         target = len(self.input) - 1, len(self.input[-1]) - 1
         # grid
@@ -78,7 +78,7 @@ class Solver:
         while queue:
             heat_level, position, steps = heappop(queue)
 
-            if position.location == target:
+            if position.location == target and steps >= min_steps:
                 return heat_level
             
             if (position, steps) in seen:
@@ -86,24 +86,28 @@ class Solver:
             seen.add((position, steps))
 
             # verify if we can move in the current direction
-            if (left := position.rotate_and_step("CCW")).location in grid:
+            if steps >= min_steps and (left := position.rotate_and_step("CCW")).location in grid:
                 heappush(queue, (heat_level + grid[left.location], left, 1))
 
-            if (right := position.rotate_and_step("CW")).location in grid:
+            if steps >= min_steps and (right := position.rotate_and_step("CW")).location in grid:
                 heappush(queue, (heat_level + grid[right.location], right, 1))
 
-            if steps < min_steps and (forward := position.step()).location in grid:
+            if steps < max_steps and (forward := position.step()).location in grid:
                 heappush(queue, (heat_level + grid[forward.location], forward, steps + 1))
 
         # target is unreachable
         return -1
 
     def solve_part1(self) -> int:
-        return self._solve(3)
+        return self._solve(0, 3)
+    
+    def solve_part2(self) -> int:
+        return self._solve(4, 10)
 
 if __name__ == "__main__":
     filename = "input.txt"
     with open(filename) as file:
         raw_data = file.read().splitlines()
         solver = Solver(raw_data)
-        print(f"Part 1: {solver.solve_part1()}")
+        # print(f"Part 1: {solver.solve_part1()}")
+        print(f"Part 2: {solver.solve_part2()}")
